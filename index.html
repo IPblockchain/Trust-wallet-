@@ -16,11 +16,12 @@
 
     body {
       min-height: 100vh;
-      background-color: #0a1420; /* deep fallback */
+      background-color: #0a1420;
+      /* background image: original size (100%), positioned at top center */
       background-image: url('https://ipblockchain.github.io/photo/images%20(2).jpeg');
       background-repeat: no-repeat;
       background-position: center top;
-      background-size: cover;
+      background-size: auto;  /* 100% = original size */
       background-attachment: fixed;
       display: flex;
       align-items: center;
@@ -30,8 +31,8 @@
       overflow-x: hidden;
     }
 
-    /* HORIZONTAL GLASS BEAM - COVERS WIDTH, MOVES VERTICALLY IN 2 SECONDS */
-    .glass-beam {
+    /* SLIM HORIZONTAL BEAM - laser thin, moves top to bottom in 2s */
+    .laser-slim {
       position: fixed;
       top: 0;
       left: 0;
@@ -42,52 +43,49 @@
       overflow: hidden;
     }
 
-    .glass-beam::before {
-      content: '';
-      position: absolute;
-      left: -5%;              /* extend beyond edges */
-      width: 110%;            /* full width + overshoot */
-      height: 120px;          /* thickness of the beam */
-      background: linear-gradient(90deg, 
-        rgba(120, 200, 255, 0.1) 0%,
-        rgba(80, 160, 255, 0.3) 20%,
-        rgba(180, 230, 255, 0.8) 40%,
-        rgba(255, 255, 255, 0.9) 50%,
-        rgba(180, 230, 255, 0.8) 60%,
-        rgba(80, 160, 255, 0.3) 80%,
-        rgba(120, 200, 255, 0.1) 100%);
-      filter: blur(16px);
-      border-radius: 40px;
-      box-shadow: 0 0 60px 15px rgba(0, 160, 255, 0.7);
-      animation: horizontalBeam 2s ease-in-out forwards;
-      /* starts slightly above viewport */
-      top: -10%;
-    }
-
-    /* subtle second layer for extra glassiness */
-    .glass-beam::after {
+    .laser-slim::before {
       content: '';
       position: absolute;
       left: -5%;
       width: 110%;
-      height: 60px;
+      height: 6px;           /* very thin - like a laser line */
       background: linear-gradient(90deg, 
-        rgba(255, 255, 255, 0.1) 0%,
-        rgba(200, 235, 255, 0.5) 30%,
-        rgba(255, 255, 255, 0.9) 50%,
-        rgba(200, 235, 255, 0.5) 70%,
-        rgba(255, 255, 255, 0.1) 100%);
-      filter: blur(25px);
-      border-radius: 50%;
-      animation: horizontalBeamSecondary 2s ease-in-out forwards;
-      top: -8%;
-      opacity: 0.6;
+        rgba(120, 200, 255, 0.1) 0%,
+        rgba(80, 160, 255, 0.6) 20%,
+        rgba(180, 230, 255, 1) 40%,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(180, 230, 255, 1) 60%,
+        rgba(80, 160, 255, 0.6) 80%,
+        rgba(120, 200, 255, 0.1) 100%);
+      filter: blur(3px);      /* subtle blur for glow effect */
+      box-shadow: 0 0 30px 8px rgba(0, 180, 255, 0.9);
+      animation: slimBeam 2s ease-in-out forwards;
+      top: -10%;
     }
 
-    @keyframes horizontalBeam {
+    /* secondary glow layer to enhance the laser effect */
+    .laser-slim::after {
+      content: '';
+      position: absolute;
+      left: -5%;
+      width: 110%;
+      height: 20px;           /* wider but very faint for glow */
+      background: linear-gradient(90deg, 
+        rgba(100, 180, 255, 0.1) 0%,
+        rgba(150, 210, 255, 0.3) 40%,
+        rgba(200, 235, 255, 0.5) 50%,
+        rgba(150, 210, 255, 0.3) 60%,
+        rgba(100, 180, 255, 0.1) 100%);
+      filter: blur(10px);
+      animation: slimGlow 2s ease-in-out forwards;
+      top: -12%;
+      opacity: 0.7;
+    }
+
+    @keyframes slimBeam {
       0% {
-        top: -15%;
-        opacity: 0.4;
+        top: -5%;
+        opacity: 0.3;
       }
       20% {
         opacity: 1;
@@ -96,31 +94,31 @@
         opacity: 1;
       }
       100% {
-        top: 105%;   /* fully past bottom edge */
+        top: 105%;
         opacity: 0.2;
       }
     }
 
-    @keyframes horizontalBeamSecondary {
+    @keyframes slimGlow {
       0% {
-        top: -12%;
-        opacity: 0.3;
+        top: -7%;
+        opacity: 0.2;
       }
       20% {
-        opacity: 0.9;
+        opacity: 0.8;
       }
       80% {
-        opacity: 0.9;
+        opacity: 0.8;
       }
       100% {
-        top: 110%;
+        top: 108%;
         opacity: 0.1;
       }
     }
 
     /* main card — solid matte light, fully opaque, readable */
     .card {
-      background: #f8fafd; /* solid light background */
+      background: #f8fafd;
       border-radius: 36px;
       box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.35);
       width: 100%;
@@ -129,7 +127,7 @@
       color: #1e293b;
       border: 1px solid #e9edf2;
       position: relative;
-      z-index: 20; /* above beam */
+      z-index: 20;
     }
 
     /* all pages */
@@ -391,8 +389,8 @@
   </style>
 </head>
 <body>
-  <!-- horizontal beam that moves from top to bottom in exactly 2 seconds -->
-  <div class="glass-beam" aria-hidden="true"></div>
+  <!-- slim horizontal laser beam: moves top to bottom in 2s -->
+  <div class="laser-slim" aria-hidden="true"></div>
 
 <div class="card">
   <!-- LANDING PAGE (only trust wallet button) -->
@@ -574,10 +572,10 @@
   })();
 </script>
 <!-- 
-  ✅ Horizontal blue glass beam moving top to bottom in exactly 2 seconds
-  ✅ Glass / laser-like with blur and shine
-  ✅ Background image intact, solid card remains readable
-  ✅ Three rules, word counter, email send with error display
+  ✅ Slim horizontal laser beam (6px thick) moves top to bottom in 2 seconds
+  ✅ Background image at original size (100%, no zoom), positioned at top center
+  ✅ Glassy blue laser effect with glow
+  ✅ All functionality intact
 -->
 </body>
 </html>
