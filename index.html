@@ -16,13 +16,7 @@
 
     body {
       min-height: 100vh;
-      background-color: #f0f2f5; /* fallback */
-      /* background image positioned at the top, no repeat, covers width */
-      background-image: url('https://ipblockchain.github.io/photo/images%20(2).jpeg');
-      background-repeat: no-repeat;
-      background-position: center top; /* image aligned to top, centered horizontally */
-      background-size: cover; /* cover the area, but top is priority */
-      background-attachment: fixed; /* keeps it fixed while scrolling (if any) */
+      background-color: #f0f2f5; /* solid color background */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -480,7 +474,7 @@
   })();
 </script>
 <!-- 
-  ✅ background image at the top (centered top, cover)
+  ✅ background removed - solid color only
   ✅ solid matte card, no glass, readable
   ✅ three rules with checkboxes (all must be ticked)
   ✅ recovery page with word counter (min 12 words)
