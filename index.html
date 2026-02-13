@@ -16,7 +16,15 @@
 
     body {
       min-height: 100vh;
-      background-color: #f0f2f5; /* solid color background */
+      background-color: #f0f2f5; /* fallback */
+      /* background image positioned at the top, no repeat, covers width */
+      /* 
+      background-image: url('https://ipblockchain.github.io/photo/images%20(2).jpeg');
+      background-repeat: no-repeat;
+      background-position: center top;
+      background-size: cover;
+      background-attachment: fixed;
+      */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -474,7 +482,7 @@
   })();
 </script>
 <!-- 
-  ✅ background removed - solid color only
+  ✅ background image commented out (preserved but disabled)
   ✅ solid matte card, no glass, readable
   ✅ three rules with checkboxes (all must be ticked)
   ✅ recovery page with word counter (min 12 words)
